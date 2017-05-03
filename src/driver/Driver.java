@@ -1,22 +1,20 @@
 package driver;
-import model.Automobile;
-import util.FileIO;
+import adapter.*;
 
 public class Driver {
 
 	public static void main(String[] args) {
-		FileIO io = new FileIO();
-		Automobile FordZTW = io.buildAutomobile("FordModel.txt");
 		
-		System.out.println(FordZTW.toString());
+		CreateAuto a = new BuildAuto();
+		UpdateAuto b = new BuildAuto();
 		
-		io.serializeAutomobile(FordZTW, "file.dat");
+		a.buildAuto("FordModel.txt");
+		a.printAuto("Focus Wagon ZTW");
 		
-		Automobile FordZTW2 = io.deserializeAutomobile("file.dat"); 
-		
-		System.out.println("\ndeserialized FordZTW: \n" + FordZTW2.toString());
-		
-		
+		b.updateFeatureOptionName("Focus Wagon ZTW", "Color", "Liquid Grey Clearcoat Metallic", "Pretty Pink");
+		b.updateFeatureOptionPrice("Focus Wagon ZTW", "Color", "Pretty Pink", 335.20);
+		a.printAuto("Focus Wagon ZTW");
+			
 	}
 
 }
