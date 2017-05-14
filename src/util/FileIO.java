@@ -6,6 +6,7 @@ import exception.AutoException;
 import model.Automobile;
 
 public class FileIO {
+	private String modelKey;
 	// constructor
 	public FileIO() {
 	}
@@ -20,9 +21,12 @@ public class FileIO {
 		return works;
 	}
 	
+	public String getModelKey(){
+		return modelKey;
+	}
+	
 	// build Automobile
 	public Automobile buildAutomobile(String filename) throws AutoException {
-		int count = 0;
 		FileReader file;
 		BufferedReader buff;
 		
@@ -38,20 +42,21 @@ public class FileIO {
 			boolean eof = false;
 			String line = buff.readLine();
 			String[] tokenM = line.split(",");
-			am.setModel(tokenM[0]);
-			am.setBasePrice(Double.parseDouble(tokenM[1]));
-			line = buff.readLine();
-			am.setFeaturesSize(Integer.parseInt(line));
-			while (!eof && count < am.getMaxNumFeatures()) {
+			am.setMake(tokenM[0]);
+			modelKey = tokenM[1];
+			am.setModel(modelKey);
+			am.setBasePrice(Double.parseDouble(tokenM[2]));
+			while (!eof) {
 				line = buff.readLine();
-				String[] tokenF = line.split(",");
-				am.addFeature(tokenF[1], Integer.parseInt(tokenF[0]));
-				for (int i = 2; i < tokenF.length; i = i + 2) {
-					am.addFeatureOption(tokenF[1], tokenF[i], Double.parseDouble(tokenF[i + 1]));
+				if(line != null){
+					String[] tokenF = line.split(",");
+					am.addFeature(tokenF[0]);
+					for (int i = 1; i < tokenF.length; i = i + 2) {
+						am.addFeatureOption(tokenF[0], tokenF[i], Double.parseDouble(tokenF[i + 1]));
+					}
+				}else{
+					eof = true;	
 				}
-				if (line == null)
-					eof = true;
-				count++;
 			}
 			buff.close();
 		} catch (IOException e) {

@@ -1,0 +1,5 @@
+Honda,Civic,2000
+Color,Red,0,Blue,0,Silver,0,Rose Gold,250
+Transmission,automatic,65,stick-shift,0
+Brakes/Traction Control,standard,0,ABS,400,ABS with Advance Trac,1625
+Slide Impact AirBags,none,0,selected,500

@@ -1,30 +1,25 @@
 package model;
 
 import java.lang.StringBuilder;
-
+import java.util.ArrayList;
 import exception.AutoException;
+import model.Automobile.Feature.FeatureOption;
 
 public class Automobile implements java.io.Serializable {
 	String model;
+	String make;
 	double basePrice;
-	Feature[] features = null;
+	ArrayList<Feature> features = new ArrayList<Feature>();
+	ArrayList<FeatureOption> choices = new ArrayList<FeatureOption>();
 
 	// constructors
 	public Automobile() {
 	}
 
-	public Automobile(String m, double bp) {
-		model = m;
+	public Automobile(String m,  String md, double bp) {
+		make = m;
+		model = md;
 		basePrice = bp;
-	}
-
-	public Automobile(String m, double bp, int size) {
-		model = m;
-		basePrice = bp;
-		features = new Feature[size];
-		for (int i = 0; i < size; i++) {
-			features[i] = new Feature();
-		}
 	}
 
 	// getters
@@ -36,6 +31,10 @@ public class Automobile implements java.io.Serializable {
 		}
 	}
 	
+	public String getMake(){
+		return make;
+	}
+	
 	public double getBasePrice() throws AutoException{
 		try{
 		return basePrice;
@@ -45,29 +44,45 @@ public class Automobile implements java.io.Serializable {
 	}
 
 	public String getFeature(String fname) throws AutoException {
-		int i = findFeaturePos(fname);
-		return features[i].toString();
+		int x = findFeaturePos(fname);
+		return features.get(x).toString();
 	}
 
-	public int getMaxNumFeatures() {
-		return features.length;
-	}
 
 	public double getFeatureOptionPrice(String fname, String foname) throws AutoException {
-		int i = findFeaturePos(fname);
-		return features[i].getFeatureOptionPrice(foname);
+		int x = findFeaturePos(fname);
+		return features.get(x).getFeatureOptionPrice(foname);
+	}
+
+	public String getFeatureOptionChoice(String fname) throws AutoException{
+		int x = findFeaturePos(fname);
+		if(x != -1 && choices.get(x)!= null)
+			return choices.get(x).getName();
+		return "no feature option chosen for this feature";	
+	}
+	public double getFeatureOptionChoicePrice(String fname) throws AutoException{
+		int x = findFeaturePos(fname);
+		if(x != -1 && choices.get(x)!= null)
+			return choices.get(x).getPrice();
+		return 0;
+	}
+	
+	public double getTotalPrice(){
+		double tp = basePrice;
+		for(int i = 0; i < choices.size(); i++){
+			if(choices.get(i) != null)
+				tp += choices.get(i).getPrice();
+		}
+		return tp;
 	}
 
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Model: " + model + " Base Price: $" + basePrice + "\n");
-
+		sb.append("Make: " + make +  " | Model: " + model + " | Base Price: $" + basePrice + "\n");
 		if (features != null) {
 			sb.append("[Features: Feature Options] \n");
-			for (int i = 0; i < features.length; i++) {
-				if (features[i] != null) {
-					sb.append(features[i].toString());
-				}
+			for (int i = 0; i < features.size(); i++) {
+				sb.append(features.get(i).toString());
 				sb.append("\n");
 			}
 		}
@@ -84,10 +99,9 @@ public class Automobile implements java.io.Serializable {
 
 	private int findFeaturePos(String fname) throws AutoException {
 		try {
-			for (int i = 0; i < features.length; i++) {
-				if (features[i] != null) {
-					if (fname.equals(features[i].getName()))
-						return i;
+			for (int i = 0; i < features.size(); i++) {
+				if(features.get(i).getName().contains(fname)){
+					return i;
 				}
 			}
 		} catch (NullPointerException e) {
@@ -104,7 +118,7 @@ public class Automobile implements java.io.Serializable {
 			e.printStackTrace();
 		}
 		if (x != -1) {
-			if (features[x].findFeatureOptionPos(foname) != -1)
+			if (features.get(x).findFeatureOptionPos(foname) != -1)
 				return true;
 		}
 		return false;
@@ -114,101 +128,88 @@ public class Automobile implements java.io.Serializable {
 	public void setModel(String name) {
 		model = name;
 	}
-
+	
+	public void setMake(String name) {
+		make = name;
+	}
+	
 	public void setBasePrice(double d) {
 		basePrice = d;
 	}
 
-	public void setFeaturesSize(int size) {
-		features = new Feature[size];
-	}
-
-	public void setFeatureOptionSize(String fname, int size) throws AutoException {
+	public void setFeatureOptionChoice(String fname, String foname) throws AutoException{
 		int x = findFeaturePos(fname);
-		features[x].setFeatureOptionSize(size);
+		features.get(x).setFeatureOptionChoice(foname);
+		choices.add(x,features.get(x).getFeatureOptionChoice());
 	}
 
 	// Delete
 	public void deleteFeature(String fname) throws AutoException {
 		int x = findFeaturePos(fname);
-		features[x] = null;
+		if(x != -1)
+			features.remove(x);
+		refactorChoices();
 	}
 
+	private void refactorChoices(){ 
+		choices.clear();
+		for(int i = 0; i < features.size(); i++){
+			choices.add(features.get(i).getFeatureOptionChoice());
+		}
+	}
+	
 	public void deleteFeatureOption(String fname, String foname) throws AutoException {
 		int x = findFeaturePos(fname);
 		if (x != -1)
-			features[x].deleteFeatureOption(foname);
+			features.get(x).deleteFeatureOption(foname);
 	}
 
 	// Update
 	public void UpdateFeature(String fname, String newName) throws AutoException {
 		int x = findFeaturePos(fname);
 		if (x != -1)
-			features[x].name = newName;
+			features.get(x).name = newName;
 	}
 
 	public void UpdateFeatureOption(String fname, String foname, String newName) throws AutoException {
 		int x = findFeaturePos(fname);
 		if (x != -1)
-			features[x].updateFeatureOption(foname, newName);
+			features.get(x).updateFeatureOption(foname, newName);
 	}
 
 	public void UpdateFeatureOption(String fname, String foname, double newPrice) throws AutoException {
 		int x = findFeaturePos(fname);
 		if (x != -1)
-			features[x].updateFeatureOption(foname, newPrice);
+			features.get(x).updateFeatureOption(foname, newPrice);
 	}
 
 	// Add
-	private int isSpace() {
-		for (int i = 0; i < features.length; i++) {
-			if (features[i] == null)
-				return i;
-		}
-		return -1;
-	}
 
 	public void addFeature(String fname) {
-		int i = isSpace();
-		if (i != -1) {
-			features[i] = new Feature(fname);
-		} else {
-			System.out.println("Sorry, no space for new feature " + fname);
-		}
-	}
-
-	public void addFeature(String fname, int foSize) {
-		int i = isSpace();
-		if (i != -1) {
-			features[i] = new Feature(fname, foSize);
-		} else {
-			System.out.println("Sorry, no space for new feature " + fname);
-		}
+			features.add(new Feature(fname));
+			choices.add(null);
+	
 	}
 
 	public void addFeatureOption(String fname, String foname) throws AutoException {
-		int i = findFeaturePos(fname);
-		if (i != -1) {
-			boolean added = features[i].addFeatureOption(foname);
-			if (added == false) {
-				System.out.println("Sorry, no space for new feature option " + foname);
-			}
+		int x = findFeaturePos(fname);
+		if (x != -1) {
+			features.get(x).addFeatureOption(foname);	
 		}
-
 	}
 
 	public void addFeatureOption(String fname, String foname, double price) throws AutoException {
-		int i = findFeaturePos(fname);
-		if (i != -1 && features[i].addFeatureOption(foname, price) == false) {
-			System.out.println("Sorry, no space for new feature option " + foname);
-		}
+		int x = findFeaturePos(fname);
+		if (x != -1)
+			features.get(x).addFeatureOption(foname, price);
 
 	}
 
 	// Inner Class
 	protected class Feature implements java.io.Serializable {
 		private String name = "";
-		private FeatureOption[] featureOptions = null;
+		private FeatureOption choice = null;
+		private ArrayList<FeatureOption> featureOptions = new ArrayList<FeatureOption>();
 
 		// constructors
 		protected Feature() {
@@ -218,13 +219,6 @@ public class Automobile implements java.io.Serializable {
 			name = n;
 		}
 
-		protected Feature(String n, int size) {
-			name = n;
-			featureOptions = new FeatureOption[size];
-			for (int i = 0; i < featureOptions.length; i++) {
-				featureOptions[i] = null;
-			}
-		}
 
 		// Getters
 		protected String getName() {
@@ -233,35 +227,36 @@ public class Automobile implements java.io.Serializable {
 
 		protected double getFeatureOptionPrice(String name) throws AutoException {
 			int i = findFeatureOptionPos(name);
-			return featureOptions[i].getPrice();
+			return featureOptions.get(i).getPrice();
+		}
+		
+		protected FeatureOption getFeatureOptionChoice(){
+			return choice;
 		}
 
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			sb.append(name + ": ");
-			if (featureOptions != null) {
-				for (int i = 0; i < featureOptions.length; i++) {
-					if (featureOptions[i] != null) {
-						sb.append(featureOptions[i].toString());
-						sb.append(", ");
-					}
-				}
+			for (int i = 0; i < featureOptions.size(); i++) {
+				sb.append(featureOptions.get(i).toString());
+				sb.append(", ");
 			}
 			return sb.toString();
 		}
 
 		// Setters
-		protected void setFeatureOptionSize(int size) {
-			featureOptions = new FeatureOption[size];
+		protected void setFeatureOptionChoice(String name) throws AutoException{
+			int x = findFeatureOptionPos(name);
+			if(x != -1)
+				choice = featureOptions.get(x);
 		}
 
 		// Find
 		protected int findFeatureOptionPos(String name) throws AutoException{
 			try{
-			for (int i = 0; i < featureOptions.length; i++) {
-				if (featureOptions[i] != null) {
-					if (name.equals(featureOptions[i].getName()))
-						return i;
+			for (int i = 0; i < featureOptions.size(); i++) {
+				if(featureOptions.get(i).getName().contains(name)){
+					return i;
 				}
 			}
 			}catch(NullPointerException e){
@@ -273,48 +268,34 @@ public class Automobile implements java.io.Serializable {
 		// Delete
 		public void deleteFeatureOption(String name) throws AutoException {
 			int x = findFeatureOptionPos(name);
-			if (x != -1)
-				featureOptions[x] = null;
+			if (x != -1){
+				if(featureOptions.get(x) == choice)
+					choice = null;
+				featureOptions.remove(x);
+			}
 		}
 
 		// Update
 		public void updateFeatureOption(String name, String newName) throws AutoException {
-			int x = findFeatureOptionPos(name);
+			int x =  findFeatureOptionPos(name);
 			if (x != -1)
-				featureOptions[x].update(newName);
+				featureOptions.get(x).update(newName);
 		}
 
 		public void updateFeatureOption(String name, double price) throws AutoException {
 			int x = findFeatureOptionPos(name);
 			if (x != -1)
-				featureOptions[x].update(price);
+				featureOptions.get(x).update(price);
 		}
 
 		// Add
-		protected boolean addFeatureOption(String name) {
-			int i = isSpace();
-			if (i != -1) {
-				featureOptions[i] = new FeatureOption(name);
-				return true;
-			}
-			return false;
+		protected void addFeatureOption(String name) {
+			featureOptions.add(new FeatureOption(name));
 		}
 
-		protected boolean addFeatureOption(String name, double price) {
-			int i = isSpace();
-			if (i != -1) {
-				featureOptions[i] = new FeatureOption(name, price);
-				return true;
-			}
-			return false;
-		}
-
-		private int isSpace() {
-			for (int i = 0; i < featureOptions.length; i++) {
-				if (featureOptions[i] == null)
-					return i;
-			}
-			return -1;
+		protected void addFeatureOption(String name, double price) {
+			featureOptions.add(new FeatureOption(name, price));
+				
 		}
 
 		// Inner Inner Class
