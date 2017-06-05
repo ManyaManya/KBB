@@ -1,36 +1,25 @@
 package driver;
 
 import adapter.*;
-import exception.AutoException;
-import model.Automobile;
-import util.FileIO;
+import scale.*;
 
 public class Driver {
 
 	public static void main(String[] args) {
-		
-		//using Automobile class
-		FileIO io = new FileIO();
-		Automobile a = null;
-		try {
-			a = io.buildAutomobile("FordModel.txt");
-		} catch (AutoException e) {
-			e.fix();
-		}
-		System.out.println("Automobile Object: ");
-		System.out.print(a);
-		System.out.println("\n******************************************************* \n Multiple Auto instances using adapter package: \n");
-		//using the interface and multiple-automibile instance capabilities 
-		CreateAuto FordZTW = new BuildAuto();
-		CreateAuto HondaCivic = new BuildAuto();
-		
-		FordZTW.buildAuto("FordModel.txt");
-		HondaCivic.buildAuto("HondaModel.txt");
-		
-		FordZTW.printAuto("Focus Wagon ZTW");
-		HondaCivic.printAuto("Civic");
-	
+		BuildAuto a = new BuildAuto();
+		a.buildAuto("HondaModel.txt");
+		a.printAuto();
+		System.out.println("Threads edit price of Feature: Color, FeatureOption:Red\n");
+		String[] p1= { "Color", "Red", "45.00" };
+		String[] p2 = { "Color", "Red", "400.00"};
+
+		EditFeatures ef1 = new EditFeatures("Civic", 3, p1);
+		EditFeatures ef2 = new EditFeatures("Civic", 3, p2);
+
+		Thread t1 = new Thread(ef1);
+		Thread t2 = new Thread(ef2);
+		t1.start();
+		t2.start();
 	}
-	
 
 }

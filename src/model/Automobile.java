@@ -165,24 +165,26 @@ public class Automobile implements java.io.Serializable {
 	}
 
 	// Update
-	public void UpdateFeature(String fname, String newName) throws AutoException {
+	public void updateFeature(String fname, String newName) throws AutoException {
 		int x = findFeaturePos(fname);
 		if (x != -1)
 			features.get(x).name = newName;
 	}
 
-	public void UpdateFeatureOption(String fname, String foname, String newName) throws AutoException {
-		int x = findFeaturePos(fname);
-		if (x != -1)
-			features.get(x).updateFeatureOption(foname, newName);
+	public void updateFeatureOption(String fname, String foname, String newName) throws AutoException {
+		
+			int x = findFeaturePos(fname);
+			if (x != -1)
+				features.get(x).updateFeatureOption(foname, newName);
+					
 	}
 
-	public void UpdateFeatureOption(String fname, String foname, double newPrice) throws AutoException {
+	public void updateFeatureOption(String fname, String foname, double newPrice) throws AutoException {
 		int x = findFeaturePos(fname);
 		if (x != -1)
 			features.get(x).updateFeatureOption(foname, newPrice);
 	}
-
+	
 	// Add
 
 	public void addFeature(String fname) {
