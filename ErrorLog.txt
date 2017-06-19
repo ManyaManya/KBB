@@ -1,1 +1,1 @@
-2017/05/14-15:00:11 Error Number: 20 Error Mssg: file name invalid
+2017/06/10-00:40:26 Error Number: 11 Error Mssg: featureOptions size undeclared

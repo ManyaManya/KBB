@@ -1,6 +1,7 @@
 package util;
 
 import java.io.*;
+import java.util.Properties;
 
 import exception.AutoException;
 import model.Automobile;
@@ -25,8 +26,9 @@ public class FileIO {
 		return modelKey;
 	}
 	
+	
 	// build Automobile
-	public Automobile buildAutomobile(String filename) throws AutoException {
+	public Automobile buildAutoCSV(String filename) throws AutoException {
 		FileReader file;
 		BufferedReader buff;
 		
@@ -64,6 +66,22 @@ public class FileIO {
 		}
 
 		return am;
+	}
+	
+	public Properties buildAutoProperties(String filename){
+		Properties props = new Properties();
+		FileInputStream in =  null;
+		try {
+			in = new FileInputStream(filename);
+		} catch (FileNotFoundException e) {
+			System.out.println("Could not read Properties file: " + filename);
+		}
+		try {
+			props.load(in);
+		} catch (IOException e) {
+			System.out.println("Could not lead file: " + filename);
+		}
+		return props;
 	}
 
 	public void serializeAutomobile(Automobile a, String file) {
